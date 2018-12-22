@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title>Forms Example</title>
+	<link type="text/css" rel="stylesheet" href="http://extjs.cachefly.net/ext-3.2.1/resources/css/ext-all.css"/>
+<style type="text/css">
+.my-panel-class {
+    font-family: tahoma,sans-serif;
+}
+</style>
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-3.2.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-3.2.1/ext-all.js"></script> 
+	<script>
+	Ext.onReady(function(){
+		Ext.BLANK_IMAGE_URL = 'images/s.gif';
+		Ext.QuickTips.init();
+
+		Ext.form.VTypes.nameVal  = /^[A-Z][A-Za-z]+\s[A-Z][A-Za-z]+$/;
+		Ext.form.VTypes.nameMask = /[A-Za-z ]/;
+		Ext.form.VTypes.nameText = 'Invalid Director Name.';
+		Ext.form.VTypes.name 	= function(v){
+			return Ext.form.VTypes.nameVal.test(v);
+		};
+
+		test = new Ext.FormPanel({ 
+			url: 'movie-form-submit.php',
+			renderTo: document.body,
+			frame: true,
+			title: 'Movie Information Form',
+			width: 250,
+			items: [{
+				xtype: 'textfield',
+				fieldLabel: 'Title',
+				name: 'title',
+				allowBlank: false
+			},{
+				xtype: 'textfield',
+				fieldLabel: 'Director',
+				name: 'director',
+				vtype: 'name'
+			},{
+				xtype: 'datefield',
+				fieldLabel: 'Released',
+				name: 'released',
+				disabledDays: [1,2,3,4,5]
+			},{
+				xtype: 'radiogroup',
+				columns: 1,
+				fieldLabel: 'Filmed In',
+				name: 'filmed_in',
+				items: [{
+					name: 'filmed_in',
+					boxLabel: 'Color',
+					inputValue: 'color'
+				},{
+					name: 'filmed_in',
+					boxLabel: 'Black & White',
+					inputValue: 'B&W'
+				}]
+			},{
+				xtype: 'checkbox',
+				fieldLabel: 'Bad Movie',
+				name: 'bad_movie'
+			}]
+		});
+	});
+	</script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<html>
+<head>
+	<title>Toolbar in Panel Example</title>
+	<link rel="stylesheet" type="text/css" href="../lib/extjs/resources/css/ext-all.css" />
+	<script type="text/javascript" src="../lib/extjs/adapter/ext/ext-base-debug.js"></script>
+	<script type="text/javascript" src="../lib/extjs/ext-all-debug.js"></script>
+	<script>
+	Ext.onReady(function(){
+		function handlerFn(item) {
+			Ext.Msg.alert("Clicked " + item.text, "Not implemented");
+		};
+
+		new Ext.Panel({
+			title: 'Panel with heavyweight toolbar',
+			renderTo: document.body,
+			width: 600,
+			height: 400,
+			tbar: new Ext.Toolbar({
+				layout: {
+					type: 'hbox',
+					align: 'stretchmax'
+				},
+				items: [{
+					xtype: 'buttongroup',
+					title: 'Group 1',
+					columns: 1,
+					items: [{
+						text: 'Group 1 Button One',
+						handler: handlerFn
+					},{
+						text: 'Group 1 Button Two',
+						handler: handlerFn
+					},{
+						text: 'Group 1 Button Three',
+						handler: handlerFn
+					}]
+				},{
+					xtype: 'buttongroup',
+					title: 'Group 2',
+					columns: 2,
+					items: [{
+						text: 'Group 2 Button One',
+						handler: handlerFn
+					},{
+						text: 'Group 2 Button Two',
+						handler: handlerFn
+					},{
+						text: 'Group 2 Button Three',
+						handler: handlerFn
+					},{
+						text: 'Group 2 Button Four',
+						handler: handlerFn
+					}]
+				}, {
+					xtype: 'box',
+					flex: 1
+				}, {
+					xtype: 'buttongroup',
+					title: 'Group 3',
+					columns: 1,
+					items: [{
+						text: 'Either this',
+						toggleGroup: 'toggle-group-id'
+					},{
+						text: 'Or this',
+						toggleGroup: 'toggle-group-id'
+					},{
+						text: 'Or even this',
+						toggleGroup: 'toggle-group-id'
+					}]
+				}, {
+					xtype: 'buttongroup',
+					title: 'Group 4',
+					columns: 1,
+					defaultType: 'menuitem',
+					items: [{
+						text: 'Item 1',
+						handler: handlerFn
+					},{
+						text: 'Item 2',
+						handler: handlerFn
+					},{
+						text: 'Item 3',
+						handler: handlerFn
+					}]
+				}]
+			}),
+			html: 'Panel Content',
+			bbar: new Ext.Toolbar({
+				items: [{
+					text: 'Submit'
+				}]
+			})
+		})
+	});
+	</script>
+</head>
+<body style="padding:10px">
+</body>
+</html>

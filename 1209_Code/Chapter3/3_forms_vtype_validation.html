@@ -1,0 +1,42 @@
+<html>
+<head>
+    <title>Forms Example</title>
+    <link type="text/css" rel="stylesheet" href="http://extjs.cachefly.net/ext-3.2.1/resources/css/ext-all.css"/>
+<style type="text/css">
+.my-panel-class {
+    font-family: tahoma,sans-serif;
+}
+</style>
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-3.2.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-3.2.1/ext-all.js"></script> 
+	<script>
+	Ext.onReady(function(){
+		new Ext.FormPanel({ 
+			url: 'movie-form-submit.php',
+			renderTo: document.body,
+			frame: true,
+			title: 'Movie Information Form',
+			width: 250,
+			items: [{
+				xtype: 'textfield',
+				fieldLabel: 'Title',
+				name: 'title',
+				allowBlank: false
+		    },{
+				xtype: 'textfield',
+				fieldLabel: 'Director',
+				name: 'director',
+				vtype: 'alpha'
+		    },{
+				xtype: 'datefield',
+				fieldLabel: 'Released',
+				name: 'released',
+				disabledDays: [1,2,3,4,5]
+		    }]
+		});
+	});
+	</script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,2 @@
+<h1>This is the overall help text</h1>
+This is displayed when the main part of the Help button is clicked.

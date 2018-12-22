@@ -1,0 +1,10 @@
+{
+    xtype: 'box',
+    html: '<b>Title</b>' +
+        '<p>The complete title of the movie (including \'The\').</p>' +
+        '<ul>' +
+        '<li>The Lord of The Rings</li>' +
+        '<li>Office Space</li>' +
+        '<li>Fight Club</li>' +
+        '</ul>'
+}

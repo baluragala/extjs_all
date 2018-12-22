@@ -1,0 +1,216 @@
+<html>
+<head>
+    <title>Editor Grids</title>
+    <link rel="stylesheet" type="text/css" href="../lib/extjs/resources/css/ext-all.css" />
+    <link rel="stylesheet" type="text/css" href="RowEditor.css" />
+    <script type="text/javascript" src="../lib/extjs/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../lib/extjs/ext-all-debug.js"></script>
+    <script type="text/javascript" src="RowEditor.js"></script>
+    <script>
+    Ext.onReady(function(){
+        Ext.BLANK_IMAGE_URL = 'images/s.gif';
+        Ext.QuickTips.init();
+
+        Ext.form.VTypes.nameVal  = /^[A-Z][A-Za-z]+\s[A-Z][A-Za-z]+$/;
+        Ext.form.VTypes.nameMask = /[A-Za-z ]/;
+        Ext.form.VTypes.nameText = 'Invalid Director Name.';
+        Ext.form.VTypes.name = function(v){
+            return Ext.form.VTypes.nameVal.test(v);
+        };
+
+        var genres = new Ext.data.SimpleStore({
+            fields: ['id', 'genre'],
+            data : [['0','New Genre'],['1','Comedy'],['2','Drama'],['3','Action']]
+        });
+
+        function genre_name(val){
+            return genres.queryBy(function(rec){
+                return rec.data.id == val;
+            }).itemAt(0).data.genre;
+        }
+
+        var Movie = Ext.data.Record.create([
+            'id',
+            'coverthumb',
+            'title',
+            'director',
+            {name: 'runtime', type: 'int'},
+            {name: 'released', type: 'date', dateFormat: 'Y-m-d'},
+            'genre',
+            'tagline',
+            {name: 'price', type: 'float'},
+            {name: 'available', type: 'bool'}
+        ]);
+
+        var store = new Ext.data.Store({
+            api: {
+                create : 'movies-sync.php?action=create',
+                read : 'movies-sync.php?action=read',
+                update: 'movies-sync.php?action=update',
+                destroy: 'movies-sync.php?action=destroy'
+            },
+            reader: new Ext.data.JsonReader({
+                root: 'data',
+                totalProperty: 'results',
+                idProperty: 'id'
+            }, Movie),
+            writer: new Ext.data.JsonWriter({
+                writeAllFields: true
+            }),
+            autoLoad: true,
+            autoSave: false,
+            listeners: {
+                exception: function(proxy, type, action, o, result, records) {
+                    if (type = 'remote') {
+                        Ext.Msg.alert("Could not " + action, result.raw.message);
+                    } else if (type = 'response') {
+                        Ext.Msg.alert("Could not " + action, "Server's response could not be decoded");
+                    } else {
+                        Ext.Msg.alert("Store sync failed", "Unknown error");
+                    }
+                }
+            }
+        });
+
+        function syncStore(rowEditor, changes, r, rowIndex) {
+            store.save();
+        }
+
+        var title_edit = new Ext.form.TextField({
+            allowBlank: false,
+            maxLength: 45
+        });
+
+        var director_edit = new Ext.form.TextField({
+            allowBlank: false,
+            maxLength: 45,
+            vtype: 'name'
+        });
+
+        var genre_edit = new Ext.form.ComboBox({
+            typeAhead: true,
+            forceSelection: true,
+            triggerAction: 'all',
+            mode: 'local',
+            store: genres,
+            displayField: 'genre',
+            valueField: 'id',
+            listeners: {
+                select: function(field, rec, idx){
+                    if (i === 0){
+                        Ext.Msg.prompt('New Genre','Name',Ext.emptyFn);
+                    }
+                }
+            }
+        });
+
+        var runtime_edit = new Ext.form.NumberField({
+            allowNegative: false,
+            allowDecimals: false
+        });
+
+        release_edit = new Ext.form.DateField({
+            format: 'm/d/Y',
+            allowBlank: false
+        });
+
+        var tagline_edit = new Ext.form.TextField({
+            allowBlank: false,
+            maxLength: 45
+        });
+
+        var rowEditor = new Ext.ux.grid.RowEditor({
+            saveText: 'Update',
+            listeners: {
+                afteredit: syncStore
+            }
+        });
+
+        var grid = new Ext.grid.GridPanel({
+            renderTo: document.body,
+            plugins: rowEditor,
+            frame: true,
+            title: 'Movie Database',
+            height: 300,
+            width: 620,
+            enableColumnMove: false,
+            store: store,
+            columns: [
+                {header: "Title", dataIndex: 'title', editor: title_edit},
+                {header: "Director", dataIndex: 'director', editor: director_edit},
+                {header: "Runtime", dataIndex: 'runtime', xtype: 'numbercolumn', format: '0', width: 70, editor: runtime_edit, align: 'right'},
+                {header: "Released", dataIndex: 'released', xtype: 'datecolumn', format: 'M d Y', width: 80, editor: release_edit},
+                {header: "Genre", dataIndex: 'genre', renderer: genre_name, editor: genre_edit},
+                {header: "Tagline", dataIndex: 'tagline', editor: tagline_edit, width: 150}
+            ],
+            sm: new Ext.grid.RowSelectionModel({
+                singleSelect: true
+            }),
+            keys: [{
+                key: 46,
+                fn: function(key,e){
+                    if (sm.hasSelection()){
+                        var sm = grid.getSelectionModel(),
+                            sel = sm.getSelected(),
+                            store = grid.getStore();
+                        Ext.Msg.show({
+                            title: 'Remove Movie', 
+                            buttons: Ext.MessageBox.YESNOCANCEL,
+                            msg: 'Remove ' + sel.data.title + '?',
+                            fn: function(btn){
+                                if (btn == 'yes'){
+                                    s.remove(sel); 
+                                    s.save();
+                                }
+                            }
+                        });
+                    }
+                },
+                ctrl: false,
+                stopEvent: true
+            }],
+            tbar: [{
+                text: 'Add Movie',
+                icon: 'images/table_add.png',
+                cls: 'x-btn-text-icon',
+                handler: function() {
+                    grid.getStore().insert(0, new Movie({
+                        id: 0,
+                        title: 'New Movie',
+                        director: '',
+                        runtime: 0,
+                        genre: 0,
+                        tagline: ''
+                    }));
+                    rowEditor.startEditing(0, true);
+                }
+            },{
+                text: 'Remove Movie',
+                icon: 'images/table_delete.png',
+                cls: 'x-btn-text-icon',
+                handler: function() {
+                    var sm = grid.getSelectionModel(),
+                        sel = sm.getSelected(),
+                        store = grid.getStore();
+                    if (sm.hasSelection()){
+                        Ext.Msg.show({
+                            title: 'Remove Movie', 
+                            buttons: Ext.MessageBox.YESNOCANCEL,
+                            msg: 'Remove ' + sel.data.title + '?',
+                            fn: function(btn){
+                                if (btn == 'yes'){
+                                    store.remove(sel); 
+                                    store.save();
+                                }
+                            }
+                        });
+                    }
+                }
+            }]
+        });
+    });
+    </script>
+</head>
+<body>
+</body>
+</html>
